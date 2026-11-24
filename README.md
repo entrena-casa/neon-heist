@@ -1,15 +1,12 @@
-# NEON RIDER (Neon Heist)
+# Neon Rider — mundo abierto neón
 
-Ahora con **moto neón**: en el menú eliges 🏍 MOTO o 🚗 COCHE. La moto se inclina en las curvas, deja un muro de luz detrás y hace el caballito con el nitro.
+Juega: https://entrena-casa.github.io/neon-heist/
 
-Juego 3D de persecuciones en una ciudad neón. Coge las bolsas de dinero y que no te pille la poli.
+- Ciudad enorme por distritos, con tráfico y policía (estrellas, patrullas, helicóptero).
+- Carreras callejeras (aros rosas) contra rivales, con premios.
+- Garajes (aros cian): compra motos y coches, mejoras, colores y crea tu banda.
+- Robos (bolsas $) y bancos (aros dorados) para guardar la pasta.
+- Multijugador: crea una sala y pasa el código de 5 letras, o únete con uno.
 
-**Controles**
-- `W A S D` / flechas: conducir
-- `SHIFT`: nitro (si embistes a la poli con nitro, la mandas por los aires)
-- `ESPACIO`: derrape (da pasta extra)
-- `P` pausa · `M` música
-
-En el móvil salen botones táctiles.
-
-Es un único `index.html` con Three.js: se abre en el navegador y ya está.
+Controles: WASD / flechas, Shift nitro, E interactuar, M mapa.
+La versión anterior está en `v1.html`.
