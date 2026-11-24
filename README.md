@@ -8,5 +8,5 @@ Juega: https://entrena-casa.github.io/neon-heist/
 - Robos (bolsas $) y bancos (aros dorados) para guardar la pasta.
 - Multijugador: crea una sala y pasa el código de 5 letras, o únete con uno.
 
-Controles: WASD / flechas, Shift nitro, E interactuar, M mapa.
+Controles: WASD / flechas conducir, Shift nitro, Espacio derrape, E entrar (garaje, banco, carrera), Tab o N mapa, T chat en sala, P pausa, M sonido.
 La versión anterior está en `v1.html`.
