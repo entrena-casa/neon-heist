@@ -1,4 +1,6 @@
-# NEON HEIST
+# NEON RIDER (Neon Heist)
+
+Ahora con **moto neón**: en el menú eliges 🏍 MOTO o 🚗 COCHE. La moto se inclina en las curvas, deja un muro de luz detrás y hace el caballito con el nitro.
 
 Juego 3D de persecuciones en una ciudad neón. Coge las bolsas de dinero y que no te pille la poli.
 
