@@ -14,14 +14,17 @@ export function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 
 export const rand = mulberry32(20261124);
 export const V3 = THREE.Vector3;
 export const fmt = n => '$' + Math.round(n).toLocaleString('es-ES');
-export const isTouch = matchMedia('(pointer:coarse)').matches;
+export const isTouch = matchMedia('(pointer:coarse)').matches || (navigator.maxTouchPoints > 0 && matchMedia('(hover:none)').matches);
 
 // estado compartido entre módulos
 export const G = { t: 0, shake: 0, player: null, rider: true, paused: false, playing: false };
 
 // ================== RENDER ==================
 export const canvas = $('game');
-export const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+let _r;
+try { _r = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' }); }
+catch (e) { throw new Error('tu navegador no deja usar gráficos 3D (WebGL). Activa la aceleración por hardware o prueba con Chrome/Safari actualizados.'); }
+export const renderer = _r;
 renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch ? 1 : 1.5));
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;

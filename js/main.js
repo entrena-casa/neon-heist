@@ -63,7 +63,13 @@ addEventListener('keydown', e => {
 });
 addEventListener('keyup', e => { keys[e.code] = false; });
 addEventListener('blur', () => { for (const k in keys) keys[k] = false; if (state.mode === 'play' && !G.paused) togglePause(); });
-if (isTouch) {
+// Controles táctiles: siempre enlazados; se muestran si el aparato es táctil o en cuanto se toca la pantalla
+G.touchUsed = isTouch;
+addEventListener('touchstart', () => {
+  if (G.touchUsed) return; G.touchUsed = true;
+  if (state.mode === 'play') $('touch').classList.remove('hidden');
+}, { passive: true });
+{
   document.querySelectorAll('#touch button[data-k]').forEach(b => {
     const k = 'T_' + b.dataset.k;
     const on = e => { e.preventDefault(); keys[k] = true; b.classList.add('on'); };
@@ -72,7 +78,7 @@ if (isTouch) {
   });
   $('tM').addEventListener('touchstart', e => { e.preventDefault(); toggleMap(); }, { passive: false });
   $('tP').addEventListener('touchstart', e => { e.preventDefault(); togglePause(); }, { passive: false });
-  $('nitroWrap').querySelector('.lbl').textContent = 'NITRO';
+  if (isTouch) $('nitroWrap').querySelector('.lbl').textContent = 'NITRO';
 }
 function ctlFromInput() {
   return {
@@ -91,7 +97,11 @@ function showOnly(id) { for (const o of ['menu', 'garage', 'lobby', 'pause', 'bi
 function play() {
   sfx.ensure();
   showOnly(null); G.paused = false;
-  $('hud').classList.remove('hidden'); if (isTouch) $('touch').classList.remove('hidden');
+  $('hud').classList.remove('hidden'); if (G.touchUsed) $('touch').classList.remove('hidden');
+  // en móvil: pantalla completa (si el navegador lo permite) para que no estorben las barras
+  if (G.touchUsed && !document.fullscreenElement && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+  }
   if (state.mode === 'menu' || state.mode === 'garage') state.mode = 'play';
   G.resetTrails();
   if (!G.started) {
@@ -312,3 +322,6 @@ if (location.hash === '#dbg') window.dbg = { player, camera, state, save, G, tra
 renderMenuWallet();
 G.resetTrails();
 frame();
+// el audio necesita un toque del usuario: lo despertamos con cualquier toque/clic
+addEventListener('pointerdown', () => sfx.ensure(), { once: true });
+window.NR && NR.done();

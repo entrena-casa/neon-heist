@@ -81,6 +81,10 @@
   .row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
   .keys{margin-top:26px;display:grid;grid-template-columns:auto auto;gap:6px 22px;font-size:12px;letter-spacing:2px;color:#b9a8e8;text-align:left}
   .keys kbd{font-family:Orbitron;color:#fff;border:1px solid #7c5cff;border-radius:6px;padding:2px 8px;box-shadow:0 0 8px #7c5cff88}
+  .btn.loading{opacity:.45;filter:saturate(.4)}
+  #loadStatus{margin-top:14px;min-height:18px;font-size:12px;letter-spacing:2px;color:#b9a8e8;line-height:1.7}
+  #loadStatus.err{color:var(--red);font-size:13px}#loadStatus .btn{margin-top:10px}
+  #loadStatus i{display:inline-block;animation:spin 1s linear infinite;font-style:normal}@keyframes spin{to{transform:rotate(360deg)}}
   .walletLine{margin-top:18px;font-size:14px;letter-spacing:3px;color:var(--green);text-shadow:0 0 8px var(--green)}
   .walletLine b{color:var(--gold);text-shadow:0 0 8px var(--gold)}
   /* garaje */
@@ -132,8 +136,18 @@
   #tM{left:16px;bottom:186px;width:52px!important;height:52px!important;font-size:18px!important}
   #tP{left:80px;bottom:186px;width:52px!important;height:52px!important;font-size:18px!important}
   @media (max-width:700px){#map{width:120px;height:120px}#speed{bottom:16px}#nitroWrap{bottom:20px}.keys{display:none}#prompt{bottom:250px}}
-  @media (pointer:coarse){#map{top:60px}#netHud{display:none}}
+  @media (pointer:coarse){#map{top:60px}#netHud{display:none}.keys{display:none}.keysTouch{display:block}}
+  .keysTouch{display:none;margin-top:20px;font-size:11px;letter-spacing:2px;line-height:1.9;color:#b9a8e8;max-width:420px}
+  /* el menú nunca se corta: si no cabe, se desplaza */
+  .overlay{justify-content:flex-start}.overlay>:first-child{margin-top:auto}.overlay>:last-child{margin-bottom:auto}
+  /* móvil en horizontal */
+  @media (max-height:500px){.title{font-size:clamp(34px,14vh,80px)}.sub{margin-bottom:10px!important}.keys{display:none}.keysTouch{margin-top:10px}
+    #map{top:6px!important;width:100px;height:100px}#stars{top:6px;font-size:20px}
+    #tE{bottom:24px!important;right:184px!important}#tD{bottom:120px!important}#tN{bottom:170px!important}#tG{bottom:86px!important}#tB{bottom:24px!important}
+    #tM,#tP{bottom:130px!important}#tL,#tR{bottom:40px!important}#speed{left:auto;right:50%;transform:translateX(50%);bottom:8px;font-size:34px;text-align:center}
+    #nitroWrap{width:150px;bottom:8px;right:50%;transform:translateX(50%) translateY(-52px)}}
 </style>
+<script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" crossorigin="anonymous"></script>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -178,7 +192,9 @@
     <button class="btn pink" id="mpBtn">MULTIJUGADOR</button>
     <button class="btn gold" id="garageBtn">GARAJE</button>
   </div>
+  <div id="loadStatus"><i>◌</i> CARGANDO LA CIUDAD…</div>
   <div class="walletLine" id="menuWallet"></div>
+  <div class="keysTouch">◀ ▶ girar · ▲ acelerar · ▼ frenar · ⚡ nitro · DRIFT derrape · E garaje/carrera · 🗺 mapa<br>Mejor con el móvil en horizontal.</div>
   <div class="keys">
     <span><kbd>W A S D</kbd> / <kbd>↑←↓→</kbd></span><span>conducir</span>
     <span><kbd>SHIFT</kbd></span><span>nitro (embiste a la poli · caballito en moto)</span>
@@ -228,6 +244,26 @@
   <div class="row"><button class="btn" id="resume">SEGUIR</button><button class="btn small" id="pMap">MAPA</button><button class="btn small" id="pMenu">MENÚ</button></div>
 </div>
 
-<script type="module" src="js/main.js"></script>
+<script>
+// Cargador: el menú se ve antes de que el juego esté listo. Si pulsas antes, se apunta y arranca solo;
+// si algo falla (sin WebGL, sin conexión, navegador viejo) lo dice en vez de quedarse muerto.
+(function(){
+  var NR=window.NR={ready:false,want:null,err:null};
+  var ids=['play','mpBtn','garageBtn'], st=document.getElementById('loadStatus');
+  function loading(on){ids.forEach(function(id){document.getElementById(id).classList.toggle('loading',on);});}
+  loading(true);
+  ids.forEach(function(id){document.getElementById(id).addEventListener('click',function(){
+    if(NR.ready) return; NR.want=id;
+    if(!NR.err) st.innerHTML='<i>◌</i> CARGANDO… ARRANCA SOLO EN CUANTO ESTÉ LISTO';
+  });});
+  var retry='<br><button class="btn small" onclick="location.reload()">REINTENTAR</button>';
+  NR.fail=function(msg){ if(NR.ready||NR.err) return; NR.err=msg; st.className='err'; st.innerHTML='⚠️ NO HA CARGADO: '+msg+retry; };
+  addEventListener('error',function(e){ if(e.message) NR.fail(e.message.replace(/^Uncaught (Error: )?/,'')); });
+  addEventListener('unhandledrejection',function(e){ var r=e.reason; NR.fail(String(r&&r.message||r)); });
+  setTimeout(function(){ if(!NR.ready&&!NR.err) st.innerHTML='<i>◌</i> TARDA MUCHO… SI TIENES POCA COBERTURA ESPERA UN POCO MÁS'+retry; },25000);
+  NR.done=function(){ NR.ready=true; loading(false); st.textContent=''; if(NR.want) document.getElementById(NR.want).click(); };
+})();
+</script>
+<script type="module" src="js/main.js" onerror="NR.fail('no se pudo descargar el juego (¿sin conexión?)')"></script>
 </body>
 </html>
